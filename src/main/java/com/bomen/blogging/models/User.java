@@ -20,7 +20,7 @@ import java.util.Collections;
 @Document
 public class User implements UserDetails {
     @Id
-    private Long id;
+    private String id;
     private String firstName;
     private String lastName;
     private String userName;
