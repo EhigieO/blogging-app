@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Optional;
 
+import static org.apache.logging.log4j.ThreadContext.isEmpty;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,7 +35,7 @@ class UserServiceTest {
         userDto.setUserName("Makanaki");
         userDto.setPhoneNumber("07039410420");
         userDto.setEmail("ikpeaeo@yahoo.com");
-        userDto.setPassword("dewwwew");
+        userDto.setPassword("dewwwewH");
 
        // loginDto = new LoginDto();
     }
@@ -52,8 +53,8 @@ class UserServiceTest {
             log.info("Error -> {}",e.getMessage());
         }
         log.info("{}", message);
-        Optional<User> user =  userService.findByEmail(userDto.getEmail());
-        assertTrue(user.isPresent());
+        User user =  userService.findByEmail(userDto.getEmail()).orElseThrow();
+        assertNotNull(user.getId());
     }
     @Test
     void cannotCreateMultipleUsers(){

@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
         if (emailExists){
             throw new BlogAppException(userDto.getEmail() + " already exits");
         }
-        if (userDto.getPassword().length() <= 8){
+        if (userDto.getPassword().length() < 8){
             throw new BlogAppException("password too short enter at least eight characters");
         }
     }
