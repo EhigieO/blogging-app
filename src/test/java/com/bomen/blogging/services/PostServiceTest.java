@@ -3,11 +3,12 @@ package com.bomen.blogging.services;
 import com.bomen.blogging.dtos.CommentDto;
 import com.bomen.blogging.dtos.PostDto;
 import com.bomen.blogging.dtos.TagDto;
+import com.bomen.blogging.dtos.UserDto;
 import com.bomen.blogging.exceptions.AlreadyExistsException;
+import com.bomen.blogging.exceptions.BlogAppException;
 import com.bomen.blogging.models.Comment;
 import com.bomen.blogging.models.Post;
 import com.bomen.blogging.models.Tag;
-import com.bomen.blogging.repositories.TagRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +19,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @Slf4j
 class PostServiceTest {
@@ -30,7 +31,11 @@ class PostServiceTest {
     @Autowired
     CommentServiceImpl commentService;
 
+    @Autowired
+    UserServiceImpl userService;
+
     PostDto postDto;
+    UserDto userDto;
     @Autowired
     TagServiceImpl tagService;
 
@@ -39,6 +44,16 @@ class PostServiceTest {
         postDto = new PostDto();
         postDto.setTitle("Dancing in the rain");
         postDto.setBody("sad souls all pretending to be happy where they are");
+        postDto.setAuthorEmail("sane@world.com");
+
+        userDto = new UserDto();
+        userDto.setFirstName("Ehigie");
+        userDto.setLastName("Ikpea");
+        userDto.setUserName("Makanaki");
+        userDto.setPhoneNumber("07039410420");
+        userDto.setEmail("ikpeaeo@yahoo.com");
+        userDto.setPassword("dewwwewH");
+
     }
 
     @AfterEach
@@ -46,10 +61,16 @@ class PostServiceTest {
         postService.reset();
         commentService.reset();
         tagService.reset();
+        userService.reset();
     }
 
     @Test
     void postCanBeCreated(){
+        try {
+            userService.createUser(userDto);
+        } catch (BlogAppException e) {
+            e.printStackTrace();
+        }
         TagDto tagDto = new TagDto();
         tagDto.setKeyWord("clothing");
         Tag tag = null;
@@ -59,12 +80,20 @@ class PostServiceTest {
             e.printStackTrace();
         }
         postDto.setTags(tag);
+        postDto.setAuthorEmail("ikpeaeo@yahoo.com");
         Post post = postService.createPost(postDto);
         log.info("this is post -> {}",post);
         assertEquals(post.getBody(), postDto.getBody());
     }
+
     @Test
     void postHasId(){
+        try {
+            userService.createUser(userDto);
+        } catch (BlogAppException e) {
+            e.printStackTrace();
+        }
+
         TagDto tagDto = new TagDto();
         tagDto.setKeyWord("clothing");
         Tag tag = null;
@@ -74,6 +103,7 @@ class PostServiceTest {
             e.printStackTrace();
         }
         postDto.setTags(tag);
+        postDto.setAuthorEmail("ikpeaeo@yahoo.com");
         Post post = postService.createPost(postDto);
         String id = post.getId();
         post = postService.findPostById(id);
@@ -82,6 +112,11 @@ class PostServiceTest {
     }
     @Test
     void canFindPostByTitle(){
+        try {
+            userService.createUser(userDto);
+        } catch (BlogAppException e) {
+            e.printStackTrace();
+        }
         TagDto tagDto = new TagDto();
         tagDto.setKeyWord("clothing");
         Tag tag = null;
@@ -91,6 +126,7 @@ class PostServiceTest {
             e.printStackTrace();
         }
         postDto.setTags(tag);
+        postDto.setAuthorEmail("ikpeaeo@yahoo.com");
         Post post = postService.createPost(postDto);
         assertEquals(postService.findPostByTitle(postDto.getTitle()),post);
     }
@@ -112,6 +148,12 @@ class PostServiceTest {
 
     @Test
     void canAddTagToPost(){
+        try {
+            userService.createUser(userDto);
+        } catch (BlogAppException e) {
+            e.printStackTrace();
+        }
+
         TagDto tagDto = new TagDto();
         tagDto.setKeyWord("clothing");
         Tag tag = null;
@@ -130,6 +172,7 @@ class PostServiceTest {
             e.printStackTrace();
         }
 
+        postDto.setAuthorEmail("ikpeaeo@yahoo.com");
         postDto.setTags(tag,tag2);
         Post post = postService.createPost(postDto);
         log.info("post with tag -> {}", post);
@@ -142,7 +185,7 @@ class PostServiceTest {
         TagDto tagDto = new TagDto();
         tagDto.setKeyWord("clothing");
         try {
-            Tag tag = tagService.createTag(tagDto);
+            tagService.createTag(tagDto);
         } catch (AlreadyExistsException e) {
             e.printStackTrace();
         }
@@ -179,14 +222,32 @@ class PostServiceTest {
         }
         postDto.setTags(tag);
 
+        userDto = new UserDto();
+        userDto.setFirstName("Ehigie");
+        userDto.setLastName("Ikpea");
+        userDto.setUserName("Makanaki");
+        userDto.setPhoneNumber("07039410420");
+        userDto.setEmail("sane@world.com");
+        userDto.setPassword("dewwwewH");
+
+        try {
+            userService.createUser(userDto);
+        } catch (BlogAppException e) {
+            log.info("Error -> {}",e.getMessage());
+        }
+
         Post post = postService.createPost(postDto);
         PostDto postDto1 = new PostDto();
         postDto1.setTitle("killer Chicken");
         postDto1.setBody("Avian flu kills chickens");
         postDto1.setTags(tag);
+        postDto1.setAuthorEmail("sane@world.com");
+
         Post post1 = postService.createPost(postDto1);
 
         List<Post> posts = postService.findAllPostsByTag("clothing");
+        log.info("posts in tag -> {}", posts);
+        //assertTrue(posts.contains(post));
         assertTrue(posts.contains(post1));
     }
 
@@ -219,6 +280,12 @@ class PostServiceTest {
 
     @Test
     void postHasComments(){
+        try {
+            userService.createUser(userDto);
+        } catch (BlogAppException e) {
+            e.printStackTrace();
+        }
+
         TagDto tagDto = new TagDto();
         tagDto.setKeyWord("clothing");
         Tag tag = null;
@@ -228,6 +295,7 @@ class PostServiceTest {
             e.printStackTrace();
         }
         postDto.setTags(tag);
+        postDto.setAuthorEmail("ikpeaeo@yahoo.com");
 
         postService.createPost(postDto);
         Post post = postService.findPostByTitle(postDto.getTitle());

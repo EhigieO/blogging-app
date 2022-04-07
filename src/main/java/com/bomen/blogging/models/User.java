@@ -10,8 +10,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,6 +30,7 @@ public class User implements UserDetails {
     private String password;
     private String phoneNumber;
     private UserRole userRole;
+    private List<Post> posts = new ArrayList<>();
     @Builder.Default
     private Boolean locked = false;
     @Builder.Default
@@ -66,5 +69,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public void addPost(Post post) {
+        posts.add(post);
     }
 }

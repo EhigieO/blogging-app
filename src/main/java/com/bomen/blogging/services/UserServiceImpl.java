@@ -2,6 +2,7 @@ package com.bomen.blogging.services;
 
 import com.bomen.blogging.dtos.UserDto;
 import com.bomen.blogging.exceptions.BlogAppException;
+import com.bomen.blogging.models.Post;
 import com.bomen.blogging.models.User;
 import com.bomen.blogging.models.UserRole;
 import com.bomen.blogging.repositories.UserRepository;
@@ -27,18 +28,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String createUser(UserDto userDto) throws BlogAppException {
+    public User createUser(UserDto userDto) throws BlogAppException {
             validateUser(userDto);
 
             User user = mapper.map(userDto, User.class);
             user.setUserRole(UserRole.AUTHOR);
-            userRepository.save(user);
-        return user.getUsername() + " created successfully";
+        return userRepository.save(user);
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow();
+    }
+
+    @Override
+    public User updateUserListOfPost(String email, Post post) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        user.addPost(post);
+        return userRepository.save(user);
     }
 
     private void validateUser(UserDto userDto) throws BlogAppException {

@@ -1,8 +1,13 @@
 package com.bomen.blogging.services;
 
 import com.bomen.blogging.dtos.LoginDto;
+import com.bomen.blogging.dtos.PostDto;
+import com.bomen.blogging.dtos.TagDto;
 import com.bomen.blogging.dtos.UserDto;
+import com.bomen.blogging.exceptions.AlreadyExistsException;
 import com.bomen.blogging.exceptions.BlogAppException;
+import com.bomen.blogging.models.Post;
+import com.bomen.blogging.models.Tag;
 import com.bomen.blogging.models.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
@@ -11,11 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Optional;
-
-import static org.apache.logging.log4j.ThreadContext.isEmpty;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Slf4j
@@ -24,7 +26,14 @@ class UserServiceTest {
     @Autowired
     UserServiceImpl userService;
 
+    @Autowired
+    TagServiceImpl tagService;
+
+    @Autowired
+    PostServiceImpl postService;
+
     UserDto userDto;
+    PostDto postDto;
     LoginDto loginDto;
 
     @BeforeEach
@@ -42,29 +51,31 @@ class UserServiceTest {
     @AfterEach
     void tearDown(){
         userService.reset();
+        postService.reset();
+        tagService.reset();
     }
 
     @Test
     void userCanBeCreated(){
-        String message = null;
+        User author = null;
         try {
-            message = userService.createUser(userDto);
+            author = userService.createUser(userDto);
         } catch (BlogAppException e) {
             log.info("Error -> {}",e.getMessage());
         }
-        log.info("{}", message);
-        User user =  userService.findByEmail(userDto.getEmail()).orElseThrow();
-        assertNotNull(user.getId());
+        log.info("{}", author);
+
+        assertNotNull(author.getId());
     }
     @Test
     void cannotCreateMultipleUsers(){
-        String message = null;
+        User author = null;
         try {
-            message = userService.createUser(userDto);
+            author = userService.createUser(userDto);
         } catch (BlogAppException e) {
             log.info("Error -> {}",e.getMessage());
         }
-        log.info("{}", message);
+        log.info("{}", author);
         UserDto userDto1 = new UserDto();
         userDto1.setFirstName("Ehigie");
         userDto1.setLastName("Ikpea");
@@ -74,7 +85,7 @@ class UserServiceTest {
         userDto1.setPassword("dewwwew");
 
         try {
-            message = userService.createUser(userDto1);
+             userService.createUser(userDto1);
         } catch (BlogAppException e) {
             log.info("Error -> {}",e.getMessage());
         }
@@ -86,5 +97,32 @@ class UserServiceTest {
 
         assertThrows(BlogAppException.class, ()-> userService.createUser(userDto));
     }
+    @Test
+    void postHasAuthor(){
+        TagDto tagDto = new TagDto();
+        tagDto.setKeyWord("clothing");
+        Tag tag = null;
+        try {
+            tag = tagService.createTag(tagDto);
+        } catch (AlreadyExistsException e) {
+            e.printStackTrace();
+        }
 
+        postDto = new PostDto();
+        postDto.setTitle("Dancing in the rain");
+        postDto.setBody("sad souls all pretending to be happy where they are");
+        postDto.setAuthorEmail("sane@world.com");
+        postDto.setTags(tag);
+
+        userDto.setEmail("sane@world.com");
+        User author = null;
+        try {
+            author = userService.createUser(userDto);
+        } catch (BlogAppException e) {
+            log.info("Error -> {}",e.getMessage());
+        }
+        log.info("{}", author);
+
+        Post post = postService.createPost(postDto);
+    }
 }
