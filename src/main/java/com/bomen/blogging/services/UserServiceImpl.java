@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
             validateUser(userDto);
 
             User user = mapper.map(userDto, User.class);
-            user.setUserRole(UserRole.AUTHOR);
+            user.setUserRole(UserRole.ROLE_AUTHOR);
         return userRepository.save(user);
     }
 

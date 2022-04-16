@@ -1,6 +1,8 @@
 package com.bomen.blogging.models;
 
 public enum UserRole {
-    AUTHOR,
-    EDITOR
+    ROLE_USER,
+    ROLE_AUTHOR,
+    ROLE_EDITOR,
+    ROLE_ADMIN
 }
