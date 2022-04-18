@@ -3,7 +3,7 @@ package com.bomen.blogging.services;
 import com.bomen.blogging.dtos.CommentDto;
 import com.bomen.blogging.dtos.PostDto;
 import com.bomen.blogging.dtos.TagDto;
-import com.bomen.blogging.dtos.UserDto;
+import com.bomen.blogging.dtos.SignUpRequest;
 import com.bomen.blogging.exceptions.AlreadyExistsException;
 import com.bomen.blogging.exceptions.BlogAppException;
 import com.bomen.blogging.models.Comment;
@@ -35,7 +35,7 @@ class PostServiceTest {
     UserServiceImpl userService;
 
     PostDto postDto;
-    UserDto userDto;
+    SignUpRequest signUpRequest;
     @Autowired
     TagServiceImpl tagService;
 
@@ -46,13 +46,13 @@ class PostServiceTest {
         postDto.setBody("sad souls all pretending to be happy where they are");
         postDto.setAuthorEmail("sane@world.com");
 
-        userDto = new UserDto();
-        userDto.setFirstName("Ehigie");
-        userDto.setLastName("Ikpea");
-        userDto.setUserName("Makanaki");
-        userDto.setPhoneNumber("07039410420");
-        userDto.setEmail("ikpeaeo@yahoo.com");
-        userDto.setPassword("dewwwewH");
+        signUpRequest = new SignUpRequest();
+        signUpRequest.setFirstName("Ehigie");
+        signUpRequest.setLastName("Ikpea");
+        signUpRequest.setUserName("Makanaki");
+        signUpRequest.setPhoneNumber("07039410420");
+        signUpRequest.setEmail("ikpeaeo@yahoo.com");
+        signUpRequest.setPassword("dewwwewH");
 
     }
 
@@ -67,7 +67,7 @@ class PostServiceTest {
     @Test
     void postCanBeCreated(){
         try {
-            userService.createUser(userDto);
+            userService.createUser(signUpRequest);
         } catch (BlogAppException e) {
             e.printStackTrace();
         }
@@ -89,7 +89,7 @@ class PostServiceTest {
     @Test
     void postHasId(){
         try {
-            userService.createUser(userDto);
+            userService.createUser(signUpRequest);
         } catch (BlogAppException e) {
             e.printStackTrace();
         }
@@ -113,7 +113,7 @@ class PostServiceTest {
     @Test
     void canFindPostByTitle(){
         try {
-            userService.createUser(userDto);
+            userService.createUser(signUpRequest);
         } catch (BlogAppException e) {
             e.printStackTrace();
         }
@@ -149,7 +149,7 @@ class PostServiceTest {
     @Test
     void canAddTagToPost(){
         try {
-            userService.createUser(userDto);
+            userService.createUser(signUpRequest);
         } catch (BlogAppException e) {
             e.printStackTrace();
         }
@@ -222,16 +222,16 @@ class PostServiceTest {
         }
         postDto.setTags(tag);
 
-        userDto = new UserDto();
-        userDto.setFirstName("Ehigie");
-        userDto.setLastName("Ikpea");
-        userDto.setUserName("Makanaki");
-        userDto.setPhoneNumber("07039410420");
-        userDto.setEmail("sane@world.com");
-        userDto.setPassword("dewwwewH");
+        signUpRequest = new SignUpRequest();
+        signUpRequest.setFirstName("Ehigie");
+        signUpRequest.setLastName("Ikpea");
+        signUpRequest.setUserName("Makanaki");
+        signUpRequest.setPhoneNumber("07039410420");
+        signUpRequest.setEmail("sane@world.com");
+        signUpRequest.setPassword("dewwwewH");
 
         try {
-            userService.createUser(userDto);
+            userService.createUser(signUpRequest);
         } catch (BlogAppException e) {
             log.info("Error -> {}",e.getMessage());
         }
@@ -281,7 +281,7 @@ class PostServiceTest {
     @Test
     void postHasComments(){
         try {
-            userService.createUser(userDto);
+            userService.createUser(signUpRequest);
         } catch (BlogAppException e) {
             e.printStackTrace();
         }

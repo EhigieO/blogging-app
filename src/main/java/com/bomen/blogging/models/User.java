@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.*;
@@ -20,14 +21,12 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document
+@Document(collection = "users")
 public class User implements UserDetails {
     @Id
     private String id;
-    @NotBlank
     @Size(max = 20)
     private String firstName;
-    @NotBlank
     @Size(max = 20)
     private String lastName;
     @NotBlank
@@ -35,21 +34,25 @@ public class User implements UserDetails {
     private String userName;
     @NotBlank
     @Size(max = 50)
+    @Email
     private String email;
     @NotBlank
-    @Size(max = 120)
+    @Size(max = 40)
     private String password;
     @NotBlank
     private String phoneNumber;
-    private UserRole userRole;
     private Collection<? extends GrantedAuthority> authorities;
     @DBRef
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
+    @Builder.Default
     private List<Post> posts = new ArrayList<>();
     @Builder.Default
     private Boolean locked = false;
     @Builder.Default
     private Boolean enabled = false;
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 //        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(userRole.name());
@@ -90,4 +93,5 @@ public class User implements UserDetails {
     public void addPost(Post post) {
         posts.add(post);
     }
+
 }
