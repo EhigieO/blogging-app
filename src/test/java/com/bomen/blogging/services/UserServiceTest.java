@@ -17,11 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Slf4j
@@ -54,7 +54,7 @@ class UserServiceTest {
         signUpRequest.setPassword("dewwwewH");
         signUpRequest.setRoles(Set.of("author","user"));
 
-       // loginRequest = new LoginRequest();
+        loginRequest = new LoginRequest();
     }
     @AfterEach
     void tearDown(){
@@ -159,5 +159,39 @@ class UserServiceTest {
         List<Role> listRoles = repo.findAll();
 
         assertThat(listRoles.size()).isEqualTo(4);
+    }
+
+    @Test
+    void testThatLoginGeneratesToken(){
+
+        User author = null;
+        try {
+            author = userService.createUser(signUpRequest);
+        } catch (BlogAppException e) {
+            log.info("Error -> {}",e.getMessage());
+        }
+        log.info("{}", author);
+
+        loginRequest.setUserName("Makanaki");
+        loginRequest.setPassword("dewwwewH");
+
+//        AccessToken token = userService.login(loginDto);
+//        log.info("Token ---->{}",token);
+//
+//        assertNotNull(token.getAccessToken());
+    }
+
+    @Test
+    void userCanBeEnabled(){
+        User author = null;
+        try {
+            author = userService.createUser(signUpRequest);
+        } catch (BlogAppException e) {
+            log.info("Error -> {}",e.getMessage());
+        }
+        assertFalse(author.getEnabled());
+        userService.enableUser(author.getEmail());
+//        assertEquals(author, userService.findByEmail(author.getEmail()));
+        assertTrue(userService.findByEmail(author.getEmail()).getEnabled());
     }
 }

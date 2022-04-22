@@ -1,5 +1,6 @@
 package com.bomen.blogging.services;
 
+import com.bomen.blogging.controllers.UserInfoResponse;
 import com.bomen.blogging.dtos.LoginRequest;
 import com.bomen.blogging.dtos.SignUpRequest;
 import com.bomen.blogging.exceptions.BlogAppException;
@@ -9,11 +10,17 @@ import com.bomen.blogging.models.User;
 import com.bomen.blogging.models.UserRole;
 import com.bomen.blogging.repositories.RoleRepository;
 import com.bomen.blogging.repositories.UserRepository;
+import com.bomen.blogging.security.Services.UserDetailsServiceImpl;
+import com.bomen.blogging.security.jwt.JwtUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -37,6 +45,10 @@ public class UserServiceImpl implements UserService {
     PasswordEncoder encoder;
     @Autowired
     AuthenticationManager authenticationManager;
+    @Autowired
+    JwtUtils jwtUtils;
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
 
 
     @Override
@@ -112,12 +124,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User login(LoginRequest loginRequest) {
+    public ResponseEntity<UserInfoResponse> login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        User userDetails = (User) authentication.getPrincipal();
+        //UserDetails userDetails = userDetailsService.loadUserByUsername(loginRequest.getUserName());
+        
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
-        return (User) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(new UserInfoResponse(userDetails.getId(),
+                        userDetails.getUsername(),
+                        userDetails.getPassword(),
+                        roles));
+    }
+
+    @Override
+    public void enableUser(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        user.setEnabled(true);
+        userRepository.save(user);
+        update(user);
     }
 
     private void validateUser(SignUpRequest signUpRequest) throws BlogAppException {
