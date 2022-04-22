@@ -20,6 +20,9 @@ public class PostServiceImpl implements PostService{
     @Autowired
     CommentServiceImpl commentService;
 
+    @Autowired
+    UserServiceImpl userService;
+
     ModelMapper mapper = new ModelMapper();
     @Autowired
     TagServiceImpl tagService;
@@ -29,6 +32,8 @@ public class PostServiceImpl implements PostService{
         Post post = mapper.map(postDto, Post.class);
         post = postRepository.save(post);
         tagService.addTag(post.getId(), postDto.getTags());
+        post.setAuthorEmail(postDto.getAuthorEmail());
+        userService.updateUserListOfPost(postDto.getAuthorEmail(),post);
         return postRepository.save(post);
     }
 
@@ -45,7 +50,6 @@ public class PostServiceImpl implements PostService{
         for (String postId : postIds) {
             posts.add(postRepository.findById(postId).orElseThrow());
         }
-        System.out.println(posts);
         return  posts;
     }
 

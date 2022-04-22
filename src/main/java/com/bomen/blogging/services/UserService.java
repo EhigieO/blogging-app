@@ -1,14 +1,30 @@
 package com.bomen.blogging.services;
 
-import com.bomen.blogging.dtos.UserDto;
+import com.bomen.blogging.controllers.UserInfoResponse;
+import com.bomen.blogging.dtos.LoginRequest;
+import com.bomen.blogging.dtos.SignUpRequest;
 import com.bomen.blogging.exceptions.BlogAppException;
+import com.bomen.blogging.models.Post;
 import com.bomen.blogging.models.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-import java.util.Optional;
-
 public interface UserService extends UserDetailsService {
-    String createUser(UserDto userDto) throws BlogAppException;
+    User createUser(SignUpRequest signUpRequest) throws BlogAppException;
 
-    Optional<User> findByEmail(String email);
+    User findByEmail(String email);
+
+    User updateUserListOfPost(String email, Post post);
+
+    boolean existsByUserName(String userName);
+
+    boolean existsByPhoneNumber(String phoneNumber);
+
+    boolean existsByEmail(String email);
+
+    void update(User user);
+
+    ResponseEntity<UserInfoResponse> login(LoginRequest loginRequest);
+
+    void enableUser(String email);
 }

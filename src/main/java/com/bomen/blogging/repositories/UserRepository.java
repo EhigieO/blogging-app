@@ -2,6 +2,7 @@ package com.bomen.blogging.repositories;
 
 import com.bomen.blogging.models.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,4 +14,11 @@ public interface UserRepository extends MongoRepository<User, String> {
     Optional<User> findByPhoneNumber(String phoneNumber);
 
     Optional<User> findByEmail(String email);
+
+    Boolean existsByUserName(String userName);
+
+    Boolean existsByEmail(String email);
+
+    Boolean existsByPhoneNumber(String phoneNumber);
+
 }

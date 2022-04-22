@@ -20,7 +20,7 @@ import java.util.List;
 public class Post {
     @Id
     private String id;
-    private String authorName;
+    private String authorEmail;
     private String title;
     private String body;
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)

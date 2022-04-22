@@ -12,6 +12,7 @@ public class PostDto {
     private List<Tag> tags;
     private String title;
     private String body;
+    private String authorEmail;
 
     public void setTags(Tag... tag) {
         tags = new ArrayList<>();
